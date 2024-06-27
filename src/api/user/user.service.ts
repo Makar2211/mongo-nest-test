@@ -1,8 +1,8 @@
-import { HttpException, HttpStatus,  Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from './model/user.model';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUserDto, LogInUserDto } from './dto/userDTO';
+import { CreateUserDto, LogInUserDto, UpdateUserDto } from './dto/userDTO';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable()
@@ -35,7 +35,6 @@ export class UserService {
 		const userPassword = await this.authService.decodePassword(userDto.password)
 
 		if (!user) throw new HttpException("Такого пользователя нет", HttpStatus.NOT_FOUND)
-		console.log()
 		if (!userPassword) {
 			throw new UnauthorizedException();
 		}
@@ -46,5 +45,18 @@ export class UserService {
 			access_token: token,
 		};
 	}
+
+	async updateUser(_id: string, updateUserDto: UpdateUserDto): Promise<UpdateUserDto> {
+		await this.userModel.findByIdAndUpdate(_id, { $set: updateUserDto }, { new: true });
+		return updateUserDto
+	}
+
+	async deleteUser(_id: string): Promise<boolean> {
+		await this.userModel.findByIdAndDelete(_id)
+		return true
+	}
+
+
+
 
 }

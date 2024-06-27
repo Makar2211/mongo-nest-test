@@ -22,6 +22,20 @@ export class CreateUserDto {
 	password: string
 }
 
+export class LogInUserReqDto {
+
+
+	@IsEmail()
+	@ApiProperty()
+	email: string;
+
+
+	@IsNotEmpty()
+	@ApiProperty()
+	password: string
+
+}
+
 export class LogInUserDto {
 
 	@ApiProperty()
@@ -47,3 +61,21 @@ export class LogInUserDto {
 	@IsString()
 	access_token: string;
 }
+
+export class UpdateUserDto {
+	@ApiProperty()
+	@IsString()
+	firstName: string;
+
+
+	@ApiProperty()
+	@IsString()
+	lastName: string;
+
+
+	@IsEmail()
+	@ApiProperty()
+	email: string;
+
+}
+

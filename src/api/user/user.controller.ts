@@ -1,15 +1,15 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
-import { CreateUserDto, LogInUserDto } from './dto/userDTO';
+import { Body, Controller, Delete, HttpCode, HttpStatus, Patch, Post, Req, Request, UseGuards } from '@nestjs/common';
+import { CreateUserDto, LogInUserDto, LogInUserReqDto, UpdateUserDto } from './dto/userDTO';
 import { UserService } from './user.service';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
 	constructor(private userService: UserService) { }
-
+	@ApiTags('API')
 	@ApiResponse({
-		status: 201,
+		status: HttpStatus.CREATED,
 		type: CreateUserDto
 	})
 	@Post('sign-up')
@@ -18,13 +18,13 @@ export class UserController {
 	}
 
 
+	@ApiTags('API')
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: LogInUserDto
+		type: LogInUserReqDto
 	})
-	@HttpCode(HttpStatus.OK)
 	@Post('sign-in')
-	logInUser(@Body() loginUserDto: any): Promise<LogInUserDto> {
+	logInUser(@Body() loginUserDto: LogInUserReqDto): Promise<LogInUserDto> {
 		try {
 			return this.userService.signIn(loginUserDto)
 		} catch (error) {
@@ -33,10 +33,28 @@ export class UserController {
 		}
 	}
 
+	@ApiTags('API')
+	@ApiResponse({
+		status: HttpStatus.CREATED,
+		type: UpdateUserDto
+	})
 	@UseGuards(AuthGuard('jwt'))
-	@Post('protected')
-	async protectedRoute(@Request() req) {
-		return { message: 'This is a protected route', user: req.body };
+	@Patch('update')
+	updateUser(@Body() updateUserDto: UpdateUserDto, @Req() request): Promise<UpdateUserDto> {
+		const user = request.user
+		return this.userService.updateUser(user._id, updateUserDto)
 	}
+
+
+	@ApiTags('API')
+	@ApiResponse({
+		status: HttpStatus.NO_CONTENT,
+	})
+	@UseGuards(AuthGuard('jwt'))
+	@Delete('delete')
+	deleteUser(@Req() request): Promise<boolean> {
+		return this.userService.deleteUser(request.user._id)
+	}
+
 
 }
