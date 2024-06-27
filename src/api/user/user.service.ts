@@ -1,17 +1,15 @@
-import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException, forwardRef } from '@nestjs/common';
+import { HttpException, HttpStatus,  Injectable, UnauthorizedException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from './model/user.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto, LogInUserDto } from './dto/userDTO';
 import { AuthService } from '../auth/auth.service';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectModel(User.name) private userModel: Model<User>,
 		private readonly authService: AuthService,
-		private jwtService: JwtService,
 	) { }
 	async checkUserEmail(email: string): Promise<any> {
 		const isEmail = await this.userModel.findOne({ email: email })
@@ -41,10 +39,11 @@ export class UserService {
 		if (!userPassword) {
 			throw new UnauthorizedException();
 		}
-		const payload = { _id: user._id, email: user.email };
+
+		const token = await this.authService.generateToken(user)
 		return {
 			...user,
-			access_token: await this.jwtService.signAsync(payload),
+			access_token: token,
 		};
 	}
 

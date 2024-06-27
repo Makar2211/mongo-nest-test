@@ -17,11 +17,11 @@ export class UserController {
 		return await this.userService.createUser(createUserDto)
 	}
 
+
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: LogInUserDto
 	})
-
 	@HttpCode(HttpStatus.OK)
 	@Post('sign-in')
 	logInUser(@Body() loginUserDto: any): Promise<LogInUserDto> {
@@ -36,7 +36,7 @@ export class UserController {
 	@UseGuards(AuthGuard('jwt'))
 	@Post('protected')
 	async protectedRoute(@Request() req) {
-		return { message: 'This is a protected route', user: req.user };
+		return { message: 'This is a protected route', user: req.body };
 	}
 
 }
