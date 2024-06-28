@@ -6,6 +6,7 @@ import configuration from 'src/config/configuration';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
+import { WatchlistModule } from '../watchlist/watchlist.module';
 
 @Module({
 	imports: [
@@ -16,7 +17,8 @@ import { AuthModule } from '../auth/auth.module';
 		}),
 		MongooseModule.forRoot(process.env.MONGO_URL),
 		UserModule,
-		AuthModule
+		AuthModule,
+		WatchlistModule
 	],
 	controllers: [AppController],
 	providers: [AppService],

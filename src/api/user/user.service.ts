@@ -30,18 +30,16 @@ export class UserService {
 		return newUser
 	}
 
-	async signIn(userDto: any): Promise<LogInUserDto> {
+	async signIn(userDto: any): Promise<any> {
 		const user = await this.checkUserEmail(userDto.email)
-		const userPassword = await this.authService.decodePassword(userDto.password)
-
 		if (!user) throw new HttpException("Такого пользователя нет", HttpStatus.NOT_FOUND)
-		if (!userPassword) {
-			throw new UnauthorizedException();
-		}
+
+		const userPassword = await this.authService.decodePassword(userDto.password, user.password)
+		if (!userPassword) throw new HttpException("Неверный пароль", HttpStatus.NOT_FOUND);
 
 		const token = await this.authService.generateToken(user)
 		return {
-			...user,
+			user,
 			access_token: token,
 		};
 	}

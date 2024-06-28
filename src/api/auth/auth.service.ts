@@ -11,8 +11,7 @@ export class AuthService {
 		return bcrypt.hash(password, saltOrRounds);
 	}
 
-	async decodePassword(password: string) {
-		const hashPassword = await this.hashPassword(password)
+	async decodePassword(password: string, hashPassword: string) {
 		const isMatch = await bcrypt.compare(password, hashPassword);
 		return isMatch
 	}
