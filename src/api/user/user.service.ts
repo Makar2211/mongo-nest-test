@@ -1,8 +1,8 @@
-import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from './model/user.model';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUserDto, LogInUserDto, UpdateUserDto } from './dto/userDTO';
+import { CreateUserDto, LogInUserResDto, UpdateUserDto, LogInUserReqDto, createUserResponseDto } from './dto/userDTO';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class UserService {
 		return isEmail
 	}
 
-	async createUser(createUserDto: CreateUserDto): Promise<CreateUserDto> {
+	async createUser(createUserDto: CreateUserDto): Promise<createUserResponseDto> {
 		const isUser = await this.checkUserEmail(createUserDto.email)
 
 		if (isUser) throw new HttpException("Такой пользователь уже существует", HttpStatus.BAD_REQUEST)
@@ -30,7 +30,7 @@ export class UserService {
 		return newUser
 	}
 
-	async signIn(userDto: any): Promise<any> {
+	async signIn(userDto: LogInUserReqDto): Promise<LogInUserResDto> {
 		const user = await this.checkUserEmail(userDto.email)
 		if (!user) throw new HttpException("Такого пользователя нет", HttpStatus.NOT_FOUND)
 

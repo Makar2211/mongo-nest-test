@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { WatchListDto } from 'src/api/watchlist/dto/watchListDto';
 
 export class CreateUserDto {
 	@ApiProperty()
@@ -12,31 +13,62 @@ export class CreateUserDto {
 	lastName: string;
 
 
-	@IsEmail()
 	@ApiProperty()
+	@IsEmail()
 	email: string;
 
 
-	@IsNotEmpty()
 	@ApiProperty()
+	@IsNotEmpty()
 	password: string
+}
+
+export class createUserResponseDto {
+
+
+	@ApiProperty()
+	@IsString()
+	firstName: string;
+
+
+	@ApiProperty()
+	@IsString()
+	lastName: string;
+
+
+	@ApiProperty()
+	@IsEmail()
+	email: string;
+
+
+	@ApiProperty()
+	@IsNotEmpty()
+	password: string
+
+	@ApiProperty()
+	@IsArray()
+	watchlist: WatchListDto[]
 }
 
 export class LogInUserReqDto {
 
 
-	@IsEmail()
 	@ApiProperty()
+	@IsEmail()
 	email: string;
 
 
-	@IsNotEmpty()
 	@ApiProperty()
+	@IsNotEmpty()
 	password: string
 
 }
 
-export class LogInUserDto {
+
+class UserResponse {
+	@ApiProperty()
+	@IsString()
+	_id: string
 
 	@ApiProperty()
 	@IsString()
@@ -56,6 +88,10 @@ export class LogInUserDto {
 	@IsNotEmpty()
 	@ApiProperty()
 	password: string
+}
+export class LogInUserResDto {
+	@ApiProperty()
+	user: UserResponse
 
 	@ApiProperty()
 	@IsString()

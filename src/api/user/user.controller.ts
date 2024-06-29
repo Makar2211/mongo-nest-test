@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Patch, Post, Req, Request, UseGuards } from '@nestjs/common';
-import { CreateUserDto, LogInUserDto, LogInUserReqDto, UpdateUserDto } from './dto/userDTO';
+import { CreateUserDto, LogInUserReqDto, LogInUserResDto, UpdateUserDto, createUserResponseDto } from './dto/userDTO';
 import { UserService } from './user.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -10,10 +10,10 @@ export class UserController {
 	@ApiTags('API')
 	@ApiResponse({
 		status: HttpStatus.CREATED,
-		type: CreateUserDto
+		type: createUserResponseDto
 	})
 	@Post('sign-up')
-	async signUp(@Body() createUserDto: CreateUserDto) {
+	async signUp(@Body() createUserDto: CreateUserDto): Promise<createUserResponseDto> {
 		return await this.userService.createUser(createUserDto)
 	}
 
@@ -21,10 +21,10 @@ export class UserController {
 	@ApiTags('API')
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: LogInUserReqDto
+		type: LogInUserResDto
 	})
 	@Post('sign-in')
-	logInUser(@Body() loginUserDto: LogInUserReqDto): Promise<LogInUserDto> {
+	logInUser(@Body() loginUserDto: LogInUserReqDto): Promise<LogInUserResDto> {
 		try {
 			return this.userService.signIn(loginUserDto)
 		} catch (error) {
