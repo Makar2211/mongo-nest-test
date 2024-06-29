@@ -2,7 +2,8 @@ import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, R
 import { WatchlistService } from './watchlist.service';
 import { WatchListDto } from './dto/watchListDto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateAccetResponse, GetAccetsResponse } from './response';
 
 @Controller('watchlist')
 export class WatchlistController {
@@ -10,36 +11,40 @@ export class WatchlistController {
 	@ApiTags('Watch List')
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: WatchListDto
+		type: CreateAccetResponse
 	})
 	@UseGuards(AuthGuard('jwt'))
 	@Post('create-accet')
-	createAsset(@Body() createAssetDto: WatchListDto, @Req() request) {
+	createAsset(@Body() createAssetDto: WatchListDto, @Req() request): Promise<CreateAccetResponse> {
 		const user = request.user
 		return this.watchListService.createAsset(user, createAssetDto)
 	}
 
 	@ApiTags('Watch List')
 	@ApiResponse({
-		status: HttpStatus.OK,
-		type: WatchListDto
+		status: HttpStatus.CREATED,
+		type: [GetAccetsResponse]
 	})
 	@UseGuards(AuthGuard('jwt'))
 	@Get('get-all')
 	getAssets(@Req() request) {
-		const { _id } = request.use
+		const { _id } = request.user
 
 		return this.watchListService.getAllAssets(_id)
 	}
 
 	@ApiTags('Watch List')
+	@ApiParam({
+		name: "id",
+		type: [String]
+	})
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: [Boolean]
 	})
 	@UseGuards(AuthGuard('jwt'))
 	@Patch('update/:id')
-	updateAccet(@Body() updateAccetDto: WatchListDto, @Param() params: { id: string }) {
+	updateAccet(@Body() updateAccetDto: WatchListDto, @Param() params: { id: string }): Promise<boolean> {
 		const { id } = params
 		return this.watchListService.updateAccet(id, updateAccetDto)
 	}
@@ -53,6 +58,10 @@ export class WatchlistController {
 
 	@UseGuards(AuthGuard('jwt'))
 	@Delete('delete/:id')
+	@ApiParam({
+		name: "id",
+		type: [String]
+	})
 	deleteAsset(@Param() params: { id: string }): Promise<boolean> {
 		const { id } = params
 		return this.watchListService.deleteAccet(id)

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { WatchListModel } from './models/watchlist.model';
 import { Model } from 'mongoose';
 import { WatchListDto } from './dto/watchListDto';
+import { CreateAccetResponse, GetAccetsResponse } from './response';
 
 @Injectable()
 export class WatchlistService {
@@ -10,7 +11,7 @@ export class WatchlistService {
 	) { }
 
 
-	async createAsset(user, dto: WatchListDto) {
+	async createAsset(user, dto: WatchListDto): Promise<CreateAccetResponse> {
 		const watchList = {
 			user: user._id,
 			name: dto.name,
@@ -22,11 +23,10 @@ export class WatchlistService {
 	}
 
 	async getAllAssets(_id: string) {
-
 		return await this.watchListRepository.find({ user: _id })
 	}
 
-	async updateAccet(id: string, updateAccetDto: WatchListDto) {
+	async updateAccet(id: string, updateAccetDto: WatchListDto): Promise<boolean> {
 		await this.watchListRepository.findByIdAndUpdate(id, {
 			name: updateAccetDto.name,
 			assetId: updateAccetDto.assetId
@@ -34,7 +34,7 @@ export class WatchlistService {
 		return true
 	}
 
-	async deleteAccet(id: string) {
+	async deleteAccet(id: string): Promise<boolean> {
 		const isCorrectId = await this.watchListRepository.findById(id)
 		if (!isCorrectId) throw new HttpException("Такой криптовалюты нет в листе", HttpStatus.NOT_FOUND)
 		await this.watchListRepository.findByIdAndDelete(id)
