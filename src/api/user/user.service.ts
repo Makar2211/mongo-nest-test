@@ -17,41 +17,59 @@ export class UserService {
 	}
 
 	async createUser(createUserDto: CreateUserDto): Promise<createUserResponseDto> {
-		const isUser = await this.checkUserEmail(createUserDto.email)
+		try {
+			const isUser = await this.checkUserEmail(createUserDto.email)
 
-		if (isUser) throw new HttpException("Такой пользователь уже существует", HttpStatus.BAD_REQUEST)
+			if (isUser) throw new HttpException("Такой пользователь уже существует", HttpStatus.BAD_REQUEST)
 
-		const hashPassword = await this.authService.hashPassword(createUserDto.password)
+			const hashPassword = await this.authService.hashPassword(createUserDto.password)
 
-		const { password, ...user } = createUserDto
+			const { password, ...user } = createUserDto
 
-		const newUser = new this.userModel({ ...user, password: hashPassword }).save()
+			const newUser = new this.userModel({ ...user, password: hashPassword }).save()
 
-		return newUser
+			return newUser
+		} catch (error) {
+			throw new Error(error)
+		}
 	}
 
 	async signIn(userDto: LogInUserReqDto): Promise<LogInUserResDto> {
-		const user = await this.checkUserEmail(userDto.email)
-		if (!user) throw new HttpException("Такого пользователя нет", HttpStatus.NOT_FOUND)
+		try {
+			const user = await this.checkUserEmail(userDto.email)
+			if (!user) throw new HttpException("Такого пользователя нет", HttpStatus.NOT_FOUND)
 
-		const userPassword = await this.authService.decodePassword(userDto.password, user.password)
-		if (!userPassword) throw new HttpException("Неверный пароль", HttpStatus.NOT_FOUND);
+			const userPassword = await this.authService.decodePassword(userDto.password, user.password)
+			if (!userPassword) throw new HttpException("Неверный пароль", HttpStatus.NOT_FOUND);
 
-		const token = await this.authService.generateToken(user)
-		return {
-			user,
-			access_token: token,
-		};
+			const token = await this.authService.generateToken(user)
+			return {
+				user,
+				access_token: token,
+			};
+		} catch (error) {
+			throw new Error(error)
+		}
 	}
 
 	async updateUser(_id: string, updateUserDto: UpdateUserDto): Promise<UpdateUserDto> {
-		await this.userModel.findByIdAndUpdate(_id, { $set: updateUserDto }, { new: true });
-		return updateUserDto
+		try {
+			const user = await this.checkUserEmail(updateUserDto.email)
+			if (user) throw new HttpException("Такая почта уже существует", HttpStatus.NOT_FOUND)
+			await this.userModel.findByIdAndUpdate(_id, { $set: updateUserDto }, { new: true });
+			return updateUserDto
+		} catch (error) {
+			throw new Error(error)
+		}
 	}
 
 	async deleteUser(_id: string): Promise<boolean> {
-		await this.userModel.findByIdAndDelete(_id)
-		return true
+		try {
+			await this.userModel.findByIdAndDelete(_id)
+			return true
+		} catch (error) {
+			throw new Error(error)
+		}
 	}
 
 
