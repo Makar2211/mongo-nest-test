@@ -49,6 +49,7 @@ export class UserController {
 	@ApiTags('API')
 	@ApiResponse({
 		status: HttpStatus.NO_CONTENT,
+		type: [Boolean]
 	})
 	@UseGuards(AuthGuard('jwt'))
 	@Delete('delete')
